@@ -1,0 +1,11 @@
+---
+layout: default
+title: Joshua Carver
+---
+
+
+<ul class="homepage">
+  {% for post in site.posts %}
+  <a href="{{ post.url }}"><li><span>{{ post.date | date_to_string }}</span>  {{ post.title }}</li></a>
+  {% endfor %}
+</uL>

@@ -1,0 +1,128 @@
+@import pretty-pieces.sass
+
+
+.nav
+  width: 100%
+  border-top: 4px solid $green
+  margin: 0 auto
+
+
+.highlight
+  padding: 10px 20px
+  +border-radius(4px)
+
+body
+  +sans-serif
+  margin: 0
+  padding: 0
+  background-repeat: no-repeat 
+
+a
+  color: darken($green, 10%)
+
+  &:hover
+    color: $green
+
+.header
+  width: 550px
+  margin: 40px auto 0
+  text-align: center
+  position: relative
+
+  h2
+    font-size: 50px
+    letter-spacing: -1px
+    color: #333
+    margin: 0
+    padding: 0
+
+  a
+    text-decoration: none
+    color: #333
+
+    &:hover
+      text-decoration: underline
+
+  h3
+    margin: 0
+    padding: 0
+    color: #777
+    font-size: 22px
+    font-weight: normal
+
+
+  hr
+    margin: 20px 0 20px
+    padding: 0
+    width: 100%
+    height: 0
+    border: none
+    border-bottom: 1px solid #ccc
+
+
+.wrapper
+  width: 550px
+  margin: 20px auto 0
+  text-align: left
+
+
+.post
+  margin-top: 40px
+
+  h1
+    font-weight: bold
+    color: #333 
+    margin: 0
+
+  h2.date
+    color: #888
+    font-weight: normal
+    margin: 5px 0 20px
+
+  p
+    font-size: 15px
+    line-height: 24px
+    font-family: Arial, sans-serif
+      
+
+.homepage
+  list-style: none
+  a
+    color: #333
+    font-weight: bold
+    text-decoration: none
+    display: block
+
+    &:hover
+      background: #eee
+
+  li
+    padding: 10px 0
+    border-bottom: 1px solid #ccc
+    font-size: 18px
+
+    span
+      color: #555
+      font-size: 15px
+      font-weight: normal 
+
+
+.highlight
+  overflow: scroll
+
+#disqus_thread
+  margin-bottom: 30px
+
+#dsq-account-dropdown
+  a
+    +button($dark-gray, 20px)
+    font-size: 13px
+
+#dsq-subscribe
+  color: #333
+  a
+    color: #333
+
+.micro.button
+  font-size: 13px
+  padding: 3px 10px

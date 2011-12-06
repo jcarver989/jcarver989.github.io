@@ -1,0 +1,101 @@
+---
+layout: post
+title: How to Write Large JavaScript Projects
+---
+
+h1. {{ page.title }}
+
+
+Client-side Javascript can have a nasty tendency to balloon out of control in a large project. Since Javascript has many quirks and no built in module or dependency system things can quickly become a tangled, bug-ridden mess if you aren't careful. Over the past year and change I've had the opportunity to work on several large JavaScript projects at "Bizo":http://bizo.com - and these are what I have found to be best practices.
+
+h3. Testing
+
+It should be obvious that testing is by far the most important thing to pay attention to when working on a large project - especially with JavaScript due to browser idiosyncrasies. You can get by without tests on small personal projects but for high quality production code - testing is a must.
+
+I've found that a combination of fast unit tests using "PhantomJs":http://www.phantomjs.org/ and "Jasmine":http://pivotal.github.com/jasmine/ for development plus a suite of cross browser Selenium tests is ideal. While you're coding you can continuously run your unit tests, which with my setup takes less then 1/10th of a second for 200+ tests. Then when it's time to deploy you run the entire suite of (slower) selenium tests. This way you maintain a high quality test suite without disrupting your normal development cycle. I'd also highly recommend checking out "SauceLabs":http://saucelabs.com/ - they allow you to run cross browser Selenium tests, which means you don't have to fuss with multiple IE vms. SauceLabs even gives you 200 minutes a month of test time free, which should be more than enough for most users needs.
+
+
+h3. Modules 
+
+Most front end developers will already be familiar with the module pattern, but if you aren't you should familiarize yourself with it. Basically we wrap a group of related functions/objects in a self executing function that returns a "public" object. This allows us to only occupy one symbol in the global namespace (our module's name) rather than one per function/variable. Here's a basic implementation of the module pattern with both private and public components: 
+
+{% highlight javascript %}
+var module = (function() {
+  var private_variable = [1,2,3];
+  var private_function = function() {
+    private_variable.push(4);
+  };
+
+  var public_interface = {};
+  public_interface.public_function = function() {
+    private_function();
+  };
+
+  return public_interface;
+})();
+{% endhighlight %}
+
+You should make use of modules throughout your project(s) to reduce the chance of accidentally overwriting variables.
+
+
+
+h3. Dependencies
+
+Modules are great, but as they grow eventually you'll want to begin to split up a module into multiple files. Smaller files are easier to reason about and easier to test in isolation. Ideally you'd have one file per object/group of related functions. But as soon as we begin splitting up modules into multiple files we have to manage dependencies. For example if we had a charting module called "Charts" we might split this up into files LineChart, BarChart and AbstractChart. Now suppose that LineChart and BarChart both depend on AbstractChart -  unfortunately Javascript doesn't a means to resolve this dependency. Instead we have to handle this ourselves or via a 3rd party tool. 
+
+One option is we could simply arrange the order in which we include scripts like so:
+
+{% highlight javascript %}
+<script type="text/javascript" src="abstract_chart.js"></script>
+<script type="text/javascript" src="line_chart.js"></script>
+<script type="text/javascript" src="bar_chart.js"></script>
+{% endhighlight %}
+
+Sadly, this approach wont scale as we add more files to our project manging dependencies like this becomes a headache at best and an head-splitting migraine that makes you want to kill kittens at worst. 
+
+Another approach is to use a script loader like "RequireJS":http://requirejs.org/ which will handle loading modules for us. This works well if you only have a hand-full of files to load - but in a large project a single module could have upwards of ten files, multiply ten by the number of modules you have and it's easy to see that this doesn't scale nicely either. 
+
+Instead, I've found the best way to manage dependencies for production is to resolve them in a compile step, such that each module ends up as a single JavaScript file concatenated in dependency order. Using our previous example of the "Charts" module we would end up with a "Charts.js" file whose contents might look like this: AbstractChart + BarChart + LineChart. This allows you to test everything in isolation and resolve dependencies in a way that still plays nicely with manual script insertion or RequireJs. 
+
+I've written a ruby gem, "Dependence.js":http://github.com/jcarver989/dependence.js that makes this kind of dependency resolution for JavaScript and/or CoffeeScript trivial. In the Charts example all you would have to do is this:
+
+AbstractChart.js
+
+{% highlight javascript %}
+function AbstractChart() {
+  // code ..
+}
+{% endhighlight %}
+
+BarChart.js
+
+{% highlight javascript %}
+// @import AbstractChart.js
+function BarChart() {
+  this.prototype = new AbstractChart();
+  // code ...
+}
+{% endhighlight %}
+
+LineChart.js
+
+{% highlight javascript %}
+// @import AbstractChart.js
+function LineChart() {
+  this.prototype = new AbstractChart();
+  // code ...
+}
+{% endhighlight %}
+
+Build Everything
+
+{% highlight bash %}
+dependence path_to_src_dir -o output_dir
+{% endhighlight %}
+
+
+h3. What about Backbone, Spine, jQuery and other frameworks?
+
+It goes without saying that if you're able to use a nice framework to abstract away some common functionality you want to use in your projects - you should. Working at "Bizo":http://bizo.com most of our code runs on 3rd part websites with an enormous amount of variation in the environment our tags are loaded in - hence the majority of my experience has been writing raw JavaScript. But don't fret there have been many, many blog posts covering how to use these frameworks and all of the above principles still apply. 
+
+That's it for now. Thoughts, comments or suggestions for important things to consider when building large JavaScript projects please share! 

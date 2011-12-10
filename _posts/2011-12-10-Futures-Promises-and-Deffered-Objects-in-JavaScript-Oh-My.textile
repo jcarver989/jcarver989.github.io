@@ -1,0 +1,132 @@
+---
+layout: post
+title: Promises in Javascript/Coffeescript
+---
+
+h1. {{ page.title }}
+
+This happens often. You're humming along writing some awesome Javascript code. At first everything is neat and organized. Then you add a feature here, an AJAX call there and before your once lovely codebase has turned into callback spaghetti. 
+
+One scenario where this can become particularly nasty is when you have an arbitrary number of asynchronous tasks, one of which cant run until all the others have completed. Suppose for example you are creating a page that displays information on your organization's engineering team and open source projects hosted on Github. This might require a few api calls to Github (eg. one to get the repositories, another to get the team members) that can be executed in parallel. We could just append the information to the DOM as each api call finishes, but it would be nice to avoid pieces of the site popping in at different times. Instead it would be ideal if we made the api calls to Github and only both api calls had completed would we render the information to the DOM. The problem is that in Javascript trying to implement this can get quite messy. 
+
+h3. A Bad Solution 
+
+The issue here is knowing when it is safe to execute the task that renders the Github information to the page. One strategy might be to store the results from each api call in an array and then wait for a set amount of time before drawing the page. 
+
+{% highlight coffeescript %}
+results = []
+
+githubApiCallOne (response) -> 
+  results.push(response)
+
+githubApiCallTwo (response) ->
+  results.push(response)
+
+setTimeout(() ->
+  drawPage(results)
+, 5000)
+{% endhighlight %}
+
+This turns out to be a poor solution as we can either end up waiting too little, in which case the program would fail or we could set the timeout too high making our users wait longer than necessary to load our page. 
+
+h3. Promises to The Rescue
+
+Fortunately there is a better way to implement our Github page. Using a construct called a Promise (sometimes called a Future) allows us to elegantly handle these types of situations. Using promises we can turn our code into something like this:
+
+{% highlight coffeescript %}
+Promise.when(
+  githubApiCallOne(),
+  githubApiCallTwo()
+).then((apiCallOneData, apiCallTwoData) ->
+  renderPage(apiCallOneData, apiCallTwoData)
+)
+{% endhighlight %}
+
+
+The basic idea is that our async api calls will now return a promise object that functions much like an IOU - they can't give us the results of the api call immediately but they (probably) can at some time in the future. The Promise.when method takes an arbitrary number of promise objects as parameters and then executes the callback in the "then" method once every promise passed to "when" has been completed. 
+
+To do this, our api calls would have to be modified to return promise objects, which turns out to be trivial. Such an implementation might look like so: 
+
+{% highlight coffeescript %}
+githubApiCallOne = () ->
+  promise = new Promise()
+
+  # async call
+  ajaxGet("/repositories", (repository_data) ->
+    # fulfill the promise when async call completes
+    promise.complete(repository_data)
+  )
+
+  return promise
+
+githubApiCallTwo = () ->
+  promise = new Promise()
+
+  ajaxGet("/users", (user_data) ->
+    promise.complete(user_data)
+  )
+
+  return promise
+
+{% endhighlight %}
+
+The githubApiCallOne and githubApiCallTwo make their ajax calls but return a promise object immediately. Then when the AJAX calls complete, they can fulfill the promise objects by calling "complete" and passing in their data. Once both promise objects have been fulfilled the callback passed to Promise.then is executed and we render the page.
+
+
+h3. With jQuery
+
+The good news is if you're already using jQuery you get Promises for free. As of jQuery 1.5 all the $.ajax methods (eg. $.get, $.post etc) return promises which allows you to do this:
+
+{% highlight coffeescript %}
+promise1 = $.get "http://foo.com"
+promise2 = $.post "http://boo.com"
+
+$.when(promise1, promise2)
+ .then (promise1Result, promise2Result) ->
+  # do something with the data
+
+{% endhighlight %}
+
+h3. What if I cant use jQuery?
+
+Rolling a custom implementation of Promises isn't recommended for production code but might be necessary if you write a lot of 3rd party Javascript and/or just want to try it for fun. Here's a very basic implementation to get you started. Error handling, exceptions etc are left as an exercise to the reader. 
+
+
+{% highlight coffeescript %}
+class Promise
+  @when: (tasks...) ->
+    num_uncompleted = tasks.length 
+    args = new Array(num_uncompleted)
+    promise = new Promise()
+
+    for task, task_id in tasks
+      ((task_id) ->
+        task.then(() ->
+          args[task_id] = Array.prototype.slice.call(arguments)
+          num_uncompleted--
+          promise.complete.apply(promise, args) if num_uncompleted == 0
+        )
+      )(task_id)
+
+    return promise
+    
+  constructor: () ->
+    @completed = false
+    @callbacks = []
+
+  complete: () ->
+    @completed = true
+    @data = arguments
+    for callback in @callbacks
+      callback.apply callback, arguments
+
+  then: (callback) ->
+    if @completed == true
+      callback.apply callback, @data
+      return
+
+    @callbacks.push callback
+{% endhighlight %}
+
+Sharp eyed readers might notice that the code inside the for loop in the Promise.when method looks a bit strange. You might notice that I'm wrapping the promise's "then" method call inside of a self executing function that passes in the task_id variable. This funkiness is actually required due to the way that closures work in Javascript. If you attempt to reference the task_id without the self executing closure, you'll actually get a reference to the task_id iterator instead of a copy - which means by the time your "then" methods execute the loop will have finished iterating and all the task_ids will share the same value! To get around this you have to create a new scope and pass in the iterator so we end up with a copy of the value instead of a reference. 
+

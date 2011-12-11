@@ -7,7 +7,7 @@ h1. {{ page.title }}
 
 This happens often. You're humming along writing some awesome Javascript code. At first everything is neat and organized. Then you add a feature here, an AJAX call there and before your once lovely codebase has turned into callback spaghetti. 
 
-One scenario where this can become particularly nasty is when you have an arbitrary number of asynchronous tasks, one of which cant run until all the others have completed. Suppose for example you are creating a page that displays information on your organization's engineering team and open source projects hosted on Github. This might require a few api calls to Github (eg. one to get the repositories, another to get the team members) that can be executed in parallel. We could just append the information to the DOM as each api call finishes, but it would be nice to avoid pieces of the site popping in at different times. Instead it would be ideal if we made the api calls to Github and only both api calls had completed would we render the information to the DOM. The problem is that in Javascript trying to implement this can get quite messy. 
+One scenario where this can become particularly nasty is when you have an arbitrary number of asynchronous tasks, one of which cant run until all the others have completed. Suppose for example you are creating a page that displays information on your organization's engineering team and open source projects hosted on Github. This might require a few api calls to Github (eg. one to get the repositories, another to get the team members) that can be executed in parallel. We could just append the information to the DOM as each api call finishes, but it would be nice to avoid pieces of the site popping in at different times. Instead it would be ideal if we made the api calls to Github and only after both api calls had completed would we render the information to the DOM. The problem is that in Javascript trying to implement this can get quite messy. 
 
 h3. A Bad Solution 
 
@@ -130,3 +130,26 @@ class Promise
 
 Sharp eyed readers might notice that the code inside the for loop in the Promise.when method looks a bit strange. You might notice that I'm wrapping the promise's "then" method call inside of a self executing function that passes in the task_id variable. This funkiness is actually required due to the way that closures work in Javascript. If you attempt to reference the task_id without the self executing closure, you'll actually get a reference to the task_id iterator instead of a copy - which means by the time your "then" methods execute the loop will have finished iterating and all the task_ids will share the same value! To get around this you have to create a new scope and pass in the iterator so we end up with a copy of the value instead of a reference. 
 
+
+And Finally an example using the supplied Promise class to prove it works: 
+
+{% highlight coffeescript %}
+
+delay = (string) ->
+  promise = new Promise()
+  setTimeout(() -> 
+    promise.complete string
+  ,200)
+  return promise
+
+logEverything = (fooData, barData, bazData) -> 
+  console.log fooData[0], barData[0], bazData[0]
+
+window.onload = () ->
+  Promise.when(
+    delay("foo"),
+    delay("bar"),
+    delay("baz")
+  ).then logEverything
+
+{% endhighlight %}

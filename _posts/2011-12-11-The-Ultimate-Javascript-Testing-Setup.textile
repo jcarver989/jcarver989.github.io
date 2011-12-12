@@ -1,0 +1,61 @@
+---
+layout: post
+title: The Ultimate Javascript Testing Setup 
+---
+
+h1. {{ page.title }} 
+
+Any programmer worth his (or her) salt knows that testing is an important part of software development. No I'm not talking about mashing refresh on your browser and seeing if your code threw an exception - I'm talking about automated unit tests. Setting up unit tests for your front end JavaScript is actually pretty easy these days. You can pick from a multitude of drop in unit testing frameworks like "Jasmine":http://pivotal.github.com/jasmine or "Google's Js Test":http://code.google.com/p/google-js-test (but you really should use Jasmine). 
+
+Loading your unit tests inside a standard browser works well for a short time on small projects with single developers. But when it comes time to integrate with the team and your build system (ex. Jenkins, Hudson, Cruise Control etc.) that approach isn't going to cut it - for the ultimate testing setup you need to be able to execute your unit tests from the command line so your builds can pass/fail appropriately. 
+
+
+What follows is what I consider to be the ultimate JavaScript test setup and is what I use everyday at "work":http://bizo.com. 
+
+h3. Test Framework: Jasmine
+
+"Jasmine":http://pivotal.github.com/jasmine is by far my favorite unit testing framework. It combines a nice rspec like syntax along with facilities for testing asynchronous and delayed (timeout) functions. There have been many articles written "like this one":http://net.tutsplus.com/tutorials/javascript-ajax/testing-your-javascript-with-jasmine/ which explain more about Jasmine's features and how to set it up, so I wont go into too much detail here. Suffice to say out of all the testing frameworks I've tried (which is a lot) - I like Jasmine the best by far. 
+
+h3. Execution Environment: PhantomJS
+
+For running tests on the command line I've yet to find anything better than "PhantomJs":http://phantomjs.org which is a headless (~ non gui) fully-fledged webkit browser. Running a headless browser like PhantomJs gives you the benefit of testing in a real (webkit) browser on the command line with very, very good performance. For example I can run over 220 unit tests in around 1/10th of a second. You might also have heard of "Zombie.js":http://zombie.labnotes.org/ but unfortunately Zombie.js isn't a complete browser and In my experience has a tendency to choke trying to execute valid JavaScript.
+
+Because of this I'd recommend using PhantomJs over something like Zomebie.js. You can install PhantomJs for most platforms "here":http://code.google.com/p/phantomjs/wiki/Installation You'll probably also want to put phantomjs on your path for convenience
+
+
+h3. Hooking it all up: Phantom-Jasmine Bridge
+
+Perhaps I've sold you on using Jasmine and PhantomJs together - but how do you set the two up and get them working together to bring you ultimate testing awesomeness? Lucky for you I've already done the hard work.   
+
+Assuming you already have PhantomJs installed all you have to do is download my "phantom-jasmine":http://github.com/jcarver989/phantom-jasmine repository over on Github. It comes with a Jasmine plugin along with a PhantomJs script that allows you to execute your suite of Jasmine tests directly on the command line with appropriate exit statuses and colored output! There's also some simple examples to help you get started.
+
+If you use the included TestRunner.html, running your tests becomes as easy as:
+
+{% highlight bash %}
+phantomjs run_jasmine_test.coffee TestRunner.html
+{% endhighlight %}
+
+
+
+If you aren't starting from scratch and have an existing Jasmine Test Suite that you'd like to use - it's still easy, just add the following to your Jasmine initialization code in your html test runner: 
+
+{% highlight html %}
+<!-- JasmineTestRunner.html -->
+
+<!-- load this file, from phantom-jasmine repo -->
+<script type="text/javascript" src="console-runner.js"></script>
+
+<script type="text/javascript">
+  // standard Jasmine init code
+  jasmine.getEnv().addReporter(new jasmine.TrivialReporter());
+
+  // what you need to add
+  var console_reporter = new jasmine.ConsoleReporter()
+  jasmine.getEnv().addReporter(console_reporter);
+
+  // make sure you add the above before execute() is called
+  jasmine.getEnv().execute();
+</script>
+{% endhighlight %}
+
+"(medium purple bordered pill button) Get the ultimate test setup for yourself &raquo;":http://github.com/jcarver989/phantom-jasmine

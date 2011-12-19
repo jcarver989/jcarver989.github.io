@@ -11,12 +11,18 @@ Cross posted on the "Bizo blog":http://dev.bizo.com
 At "Bizo":http://bizo.com we try to blog fairly often. But writing blog posts with any degree of frequency at a startup is tough - there are often ten other important tasks that needed to be done yesterday. Finding the time to sit down and write a post when you have features to build, code to review and the occasional meeting is difficult to say the least.
 
 
-We needed something that would encourage us to blog more frequently, and there's no better way to motivate a bunch of engineers than a game. So during our last Open Source Day we built a Blog Scoreboard that ranks authors based on the number of posts and comments they have. It's setup on our office big screen tv serving as constant reminder that "Larry":http://twitter.com/#!/ogrodnek/ is by a landslide, the king of blogging. For a live demo of the scoreboard and to see just how much Larry is dominating us, checkout "the live example here":http://blog-leaderboard.heroku.com.
+We needed something that would encourage us to blog more frequently, and there's no better way to motivate a bunch of engineers than a game. So during our last Open Source Day we built a Blog Scoreboard that ranks authors based on the number of posts and comments they have. It's setup on our office big screen tv serving as constant reminder that "Larry":http://twitter.com/#!/ogrodnek/ is by a landslide, the king of blogging. For a live demo of the scoreboard and to see just how much Larry is dominating us, checkout the live example below: 
+
+
+Currently we just optimize towards the volume of posts so the points are currently assigned as: 10 points per blog post and 1 point per comment. The weighting scheme is intentionally naive due since this had to be built in a few hours and will undoubtably change as time goes on.
+
+The best part about our scoreboard is that it is an open source sinatra (ruby) app, and it works with any Blogger blog! All you have to do is edit a few lines of YAML and you'll have your very own big screen blog scoreboard. You can grab the source code and install instructions on github
 
 !/images/scoreboard_small.jpg!
 
+"(medium purple pill bordered button) Live demo":http://blog-leaderboard.heroku.com "(medium green pill bordered button) Get your own scoreboard":https://github.com/jcarver989/blog-scoreboard 
 
-Currently we just optimize towards the volume of posts so the points are currently assigned as: 10 points per blog post and 1 point per comment. The weighting scheme is intentionally naive due since this had to be built in a few hours and will undoubtably change as time goes on
 
-The best part about our scoreboard is that it is an open source sinatra (ruby) app, and it works with any Blogger blog! All you have to do is edit a few lines of YAML and you'll have your very own big screen blog scoreboard. You can grab the source code and install instructions on github: "https://github.com/jcarver989/blog-scoreboard":https://github.com/jcarver989/blog-scoreboard Happy blogging!
+
+
 

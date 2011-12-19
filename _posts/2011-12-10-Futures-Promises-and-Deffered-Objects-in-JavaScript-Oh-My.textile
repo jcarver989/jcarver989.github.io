@@ -5,6 +5,8 @@ title: Promises in Javascript/Coffeescript
 
 h1. {{ page.title }}
 
+Cross posted on the "Bizo Dev Blog":http://dev.bizo.com
+
 This happens often. You're humming along writing some awesome Javascript code. At first everything is neat and organized. Then you add a feature here, an AJAX call there and before your once lovely codebase has turned into callback spaghetti. 
 
 One scenario where this can become particularly nasty is when you have an arbitrary number of asynchronous tasks, one of which cant run until all the others have completed. Suppose for example you are creating a page that displays information on your organization's engineering team and open source projects hosted on Github. This might require a few api calls to Github (eg. one to get the repositories, another to get the team members) that can be executed in parallel. We could just append the information to the DOM as each api call finishes, but it would be nice to avoid pieces of the site popping in at different times. Instead it would be ideal if we made the api calls to Github and only after both api calls had completed would we render the information to the DOM. The problem is that in Javascript trying to implement this can get quite messy. 

@@ -1,6 +1,8 @@
 @import pretty-pieces.sass
 
 
+$light-green: lighten($green, 42%)
+
 
 // General
 // ------------------
@@ -98,7 +100,7 @@ a
     display: block
 
     &:hover
-      background: #eee
+      background: $light-green 
 
   li
     padding: 10px 0
@@ -110,6 +112,51 @@ a
       font-size: 15px
       font-weight: normal 
 
+
+// Social Buttons
+.social-bar
+  position: relative
+  padding-top: 15px
+  margin-bottom: 50px
+
+
+.social-bar-buttons
+  position: absolute
+  top: 16px
+  right: 0 
+  left: 0
+  margin: auto
+  width: 138px
+  text-align: center
+  +inset-button-group(4px, #eee)
+
+  a
+    color: #333
+    text-shadow: none
+    position: relative
+    height: 24px
+    padding: 5px 10px 5px 34px
+    line-height: 24px
+    border-top: 1px solid #ccc
+    border-bottom: 1px solid #aaa 
+    +gradient(#f5f5f5, #eee)
+
+    &:hover, &.active
+      background: $light-green 
+
+
+    &:first-child
+      border-left: 1px solid #ccc
+      padding-left: 34px
+
+    &:last-child
+      border-right: 1px solid #ccc
+
+    img
+      position: absolute
+      left: 10px
+      display: block
+      
 
 // Misc
 // -----------------

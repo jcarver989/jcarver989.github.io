@@ -1624,6 +1624,57 @@ a {
       left: 10px;
       display: block; }
 
+#lefthover, #righthover {
+  position: fixed;
+  width: 25%;
+  height: 100%; }
+  #lefthover .arrow-container, #righthover .arrow-container {
+    position: fixed;
+    top: 50%;
+    margin-top: -75px; }
+  #lefthover h3, #righthover h3 {
+    position: absolute;
+    display: none;
+    color: #333333;
+    margin: 0px;
+    word-wrap: break-word; }
+    #lefthover h3 small, #righthover h3 small {
+      color: #555555;
+      font-weight: normal; }
+  #lefthover .hover-box, #righthover .hover-box {
+    display: none;
+    background: #eeeeee;
+    border: 1px solid #cccccc;
+    padding: 15px;
+    position: absolute; }
+    #lefthover .hover-box img, #righthover .hover-box img {
+      display: block;
+      margin: 0 auto;
+      width: 45px; }
+  #lefthover:hover h3, #righthover:hover h3 {
+    display: block; }
+  #lefthover:hover .hover-box, #righthover:hover .hover-box {
+    display: block;
+    background: #daeea6; }
+
+#lefthover {
+  left: 0; }
+  #lefthover .arrow-container {
+    left: 0; }
+  #lefthover h3 {
+    left: 100px; }
+  #lefthover .hover-box {
+    left: 0; }
+
+#righthover {
+  right: 0; }
+  #righthover .arrow-container {
+    right: 0; }
+  #righthover h3 {
+    right: 100px; }
+  #righthover .hover-box {
+    right: 0; }
+
 .highlight {
   overflow: scroll; }
 

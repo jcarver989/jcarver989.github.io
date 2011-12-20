@@ -158,6 +158,75 @@ a
       display: block
       
 
+// Arrow Nav
+// -----------------
+
+#lefthover, #righthover
+  position: fixed
+  width: 25%
+  height: 100%
+
+  .arrow-container
+    position: fixed
+    top: 50%
+    margin-top: -75px
+
+  h3
+    position: absolute
+    display: none
+    color: #333
+    margin: 0px
+    word-wrap: break-word
+
+    small
+      color: #555
+      font-weight: normal
+
+  .hover-box
+    display: none
+    background: #eee
+    border: 1px solid #ccc
+    padding: 15px
+    position: absolute
+
+    img
+      display: block
+      margin: 0 auto
+      width: 45px
+
+
+  &:hover
+    h3
+      display: block
+
+    .hover-box
+      display: block
+      background: $light-green
+
+#lefthover
+  left: 0
+
+  .arrow-container
+    left: 0
+
+  h3
+    left: 100px
+
+  .hover-box
+    left: 0
+
+#righthover
+  right: 0
+
+  .arrow-container
+    right: 0
+
+  h3
+    right: 100px
+
+  .hover-box
+    right: 0
+
 // Misc
 // -----------------
 .highlight

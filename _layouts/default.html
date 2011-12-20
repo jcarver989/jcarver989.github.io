@@ -6,6 +6,36 @@
     <title>{{ page.title }}</title>
   </head>
   <body>
+
+    {% if page.next.url %}
+    <a href="{{page.next.url}}" id="righthover">
+      <div class="arrow-container">
+        <h3>
+          <small>{{ page.next.date | date_to_string }}</small> 
+          {{page.next.title}}
+        </h3>
+        <div class="hover-box">
+          <img src="/images/right-45.png" />
+        </div>
+      </div>
+    </a>
+    {% endif %}
+
+    {% if page.previous.url %}
+    <a href="{{page.previous.url}}" id="lefthover">
+      <div class="arrow-container">
+        <h3>
+          <small>{{ page.previous.date | date_to_string }}</small> 
+          {{page.previous.title}}
+        </h3>
+
+        <div class="hover-box">
+          <img src="/images/left-45.png" />
+        </div>
+      </div>
+    </a>
+    {% endif %}
+
     <div class="nav">
     </div>
 

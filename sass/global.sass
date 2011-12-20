@@ -86,8 +86,11 @@ a
     font-family: Arial, sans-serif
 
   img
-    padding: 3px
-    border: 1px solid #ccc
+    position: relative
+    padding: 15px
+    background: #fff
+    +border-radius(4px)
+    +box-shadow(0 1px 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1) inset)
       
 // Homepage
 // -------------------
@@ -260,3 +263,12 @@ a
 .highlight
   padding: 10px 20px
   +border-radius(4px)
+
+
+= transform($trans)
+  -moz-transform: $trans
+  -webkit-transform: $trans
+  -o-transform: $trans
+  -ms-transform: $trans
+
+

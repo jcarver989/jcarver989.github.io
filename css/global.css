@@ -1637,10 +1637,12 @@ a {
     display: none;
     color: #333333;
     margin: 0px;
+    min-width: 120px;
     word-wrap: break-word; }
     #lefthover h3 small, #righthover h3 small {
       color: #555555;
-      font-weight: normal; }
+      font-weight: normal;
+      display: block; }
   #lefthover .hover-box, #righthover .hover-box {
     display: none;
     background: #eeeeee;

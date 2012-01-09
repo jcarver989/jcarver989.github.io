@@ -1,0 +1,260 @@
+---
+layout: post
+title: How To Write Your Own DSL 
+---
+
+h1. {{ page.title }}
+
+
+
+DLS's or Domain Specific Languages have become quite popular over the past few years. Perhaps you've heard of DSLs before, but even if you haven't chances are you've come into contact with one before. "Ruby On Rails":http://http://rubyonrails.org/, for example can be seen as a DSL for writing web apps, "jQuery":http://jquery.com/ is a DSL for manipulating the DOM and "SQL":http://en.wikipedia.org/wiki/SQL is a DSL for writing database queries.  
+
+
+h2. Why Bother With DSLs? 
+
+DSLs are useful tools - they allow us to easily express logic specific to a particular problem (domain) that would be otherwise difficult (or verbose) to write in another language. Usually this boils down that to using a grammar and syntax that more closely resembles the lexicon used by the target domain. For example a mathematician working with matrices doesn't think in loops, iterators or arrays but instead thinks in terms of vectors, dot products and transformations. Using a general purpose language with only arrays and iterators would require a fair amount of mental gymnastics for our mathematician as he would have to mentally translate between his problem domain (matrices) and the language he writes code in (ex. c++). Using a DSL designed for matrix operations would eliminate this mental translation while simultaneously providing code that is both more terse and (hopefully) less error prone.  
+
+
+h2. Types of DSLs
+
+DSLs come in two forms - **external** and **internal**. External DSL's exist independently from any other language, SQL is a good example of an external DSL. Internal DSL's on the other hand live inside another programming language - for example Rails is an internal DSL which is hosted within the Ruby programming language. 
+
+Typically internal DSLs are easier to create but aren't as flexible as external DSL's. Internal DSL's need not worry about parsing or grammars but must conform to valid syntax within the host language (eg. all Rails code is valid Ruby syntax), conversely an external DSL can have any syntax its creator wishes at the cost more work to build a parser and grammar (again think SQL).
+
+One final thing to keep in mind is that internal DSLs allow you to take full advantage of the host language. Large applications often touch across multiple domains (database, business logic etc.) and passing data between multiple DSLs in a single host language tends to be much less of a headache than juggling multiple external DSLs - which is why I prefer internal DSLs to external ones.   
+
+
+h2. Making Your Own DSL
+
+At first glance DSLs can be daunting - but fear not they don't require magical unicorns or  superhuman powers. Actually they often turn out to be simple to create. This post will show you how to make your very own internal DSL using Ruby. 
+
+h3. Picking a Domain
+
+All DSLs start with a domain - so let's pick something - say Amazon's CloudWatch service. If you aren't familiar with CloudWatch it allows you to store, retrieve and aggregate metrics pertaining to servers you run in their cloud (EC2) service. Currently Amazon provides a command line tool (mon-get-stats) for querying CloudWatch, but it's fairly low level. Often times you want to aggregate metrics about servers running in multiple regions - the current tool only allows you to query one region at a time, so for multi-regional metrics you're forced to manually merge the data. Having a nice DSL to help us view CloudWatch data across multiple regions would be great, so let's get to it! 
+
+
+h3. Where to Start
+
+Often when writing a new DSL it's helpful to start by imagining how we'd like the ideal syntax to look. To have a good idea of what this ideal syntax might be, we should examin our requirements:
+
+* We know we want to retrieve CloudWatch metrics from multiple regions. 
+* We'll want to look at multiple metrics from the server's load balancer (abbreviated **elb**) instead of a specific server instance (instances tend to be transient, sitting behind load balancers which are available). 
+* CloudWatch stores data for up to two weeks, so our DSL will need a way of expressing what time frame we're interested in seeing. 
+
+Something like the following would be a great start:
+
+{% highlight ruby %}
+  # Assume DSL defined above
+
+  cloudwatch = CloudWatchClient.new
+
+  # returns our aggregated data
+  cloudwatch.stats do
+    elb           "my-app-server"
+    regions       :us_east_1, :us_west_1
+    metrics       :request_count, :other_metric
+    units         :count 
+    aggregation   :sum  
+    start_time    Time.now.beginning_of_day 
+    period        1.hour.to_s
+  end
+{% endhighlight %}
+
+
+Using our proposed syntax we instantiate an CloudWatchClient class whose stats() method serves as the entry point into our DSL. The above might seem a bit magical, but I promise it's nothing crazy. We simply execute the stats method and pass in a block (unexecuted function, similar to a lambda in other languages). All the special syntax inside the block will turn out to be just plain ol' ruby method calls. 
+
+h3. Implementing
+
+Let's sketch out what our entry point class, CloudWatchClient will look like:
+
+
+
+{% highlight ruby %}
+class CloudWatchClient
+  include MergeData
+
+  def initialize
+    # authenticate with CloudWatch's api
+  end
+
+  def stats(&block)
+    # generate query parameters (heart of our DSL)
+    queries = Query.new(&block)
+
+   # make cloudwatch api request(s)
+    get_stats(queries)
+
+   # merge the regional data 
+   # from MergeData module
+    merge_data(results)
+  end
+
+  private
+
+  def get_stats(queries = [])
+    # make necessary requests to CloudWatch's api
+  end
+end
+
+{% endhighlight %}
+
+Following best practices for object-oriented programming, our client class has one responsibility - making requests to the CloudWatch api. CloudWatch's api only allows querying for one metric and one region at a time, so we have to make multiple requests to the api and then merge them into a single data structure. Generating requests parameters and merging data are two separate tasks and thus live in their own classes/modules.
+
+h3. The DSLs heart
+
+The task of merging regional data is delegated to a module called MergeData (left unimplemented) while the task of generating the query parameters is contained in the Query class. The Query class is really the heart of our DSL so I'll be focusing on that class and leave the nuts and bolts of making requests to the CloudWatch api along with merging the results as an exercise to the reader. 
+
+
+Here's a first crack at our Query class that contains our DSL methods:
+
+
+{% highlight ruby %}
+class Query 
+  def initialize(&block)
+    # defaults
+    @elb             = "Foo" 
+    @regions         = ["us-east-1"]
+    @metrics         = ["RequestCount"]
+    @aggregation     = "Average"
+    @units           = "Count"
+    @start_time      = Time.now.beginning_of_day
+    @period          = 1.hour.to_s
+
+    instance_eval(&block)
+    to_cloudwatch_query_format
+  end
+
+  def elb(elb)
+    @elb = elb
+  end
+
+  # varargs
+  def regions(*regions)
+    @regions = regions
+  end
+
+  def metrics(*metrics)
+    @metrics = metrics
+  end
+
+  def aggregation(aggreation)
+    @aggregation = aggregation
+  end
+
+  def units(units)
+    @units = units
+  end
+
+  def start_time(start_time)
+    @start_time = start_time
+  end
+
+  def period(period)
+    @period = period
+  end
+
+  private
+  def to_cloudwatch_query_format
+   # map data into format cloudwatch api understands
+  end
+end
+
+{% endhighlight %}
+
+h3. Instance eval
+
+Notice how our initialize method takes in a block and converts it to a proc with:  **instance_eval(&block)**. This line is key to understanding the whole class. Ruby's instance eval takes a block and executes within the context of the class instance_eval was called from. This has **makes all of Query's methods callable in the block passed to Query's initialize method**. 
+
+So we can write: 
+
+{% highlight ruby %}
+Query.new do
+  elb           "my-app-server"
+  regions       :us_east_1, :us_west_1
+  metrics       :request_count, :other_metric
+  units         :count 
+  aggregation   :sum  
+  start_time    Time.now.beginning_of_day 
+  period        1.hour.to_s
+end
+{% endhighlight %}
+
+Which really is just syntax sugar for regular method calls on the Query object, eg.:
+
+{% highlight ruby %}
+
+query = Query.new do 
+end
+
+query.elb           "my-app-server"
+query.regions       :us_east_1, :us_west_1
+query.metrics       :request_count, :other_metric
+query.units         :count 
+query.aggregation   :sum  
+query.start_time    Time.now.beginning_of_day 
+query.period        1.hour.to_s
+
+{% endhighlight %}
+
+
+h3. Refactoring The Query Class
+
+One issue with our Query class is that it's more verbose than it needs to be, we're defining one method per field - ex elb, period, start_time. This gets worse as we add more fields to our DSL. Instead we can use Ruby's meta programming features to create a macro which creates these setters for us, like so:.   
+
+{% highlight ruby %}
+class Query
+  def self.setter(*method_names)
+    method_names.each do |name|
+      send :define_method, name do |data|
+        instance_variable_set "@#{name}".to_sym, data 
+      end
+    end
+  end
+
+  def self.varags_setter(*method_names)
+    method_names.each do |name|
+      send :define_method, name do |*data|
+        instance_variable_set "@#{name}".to_sym, data 
+      end
+    end
+  end
+
+  setter :elb, :aggregation, :units, :start_time, :period
+  varargs_setter :metrics, :regions 
+
+  def initialize(&block)
+    # defaults
+    @elb             = "Foo" 
+    @regions         = ["us-east-1"]
+    @metrics         = ["RequestCount"]
+    @aggregation     = "Average"
+    @units           = "Count"
+    @start_time      = Time.now.beginning_of_day
+    @period          = 1.hour.to_s
+
+    instance_eval(&block)
+    to_cloudwatch_query_format
+  end
+
+  private
+  def to_cloudwatch_query_format
+   # map data into format cloudwatch api understands
+  end
+
+end
+{% endhighlight %}
+
+Here we're adding two static methods on Query, setter and varags_setter. These methods are simple macros which creating setter methods automatically for us. You could also use Ruby's built in attr_accessor method here instead of rolling our own but that causes setter methods to be named like elb=() rather than elb() which is extra syntactic noise and you'd have to deal with setters taking multiple parameters another way.  
+
+h2. Putting It All Together
+
+At this point we've created our Query class which contains all of our DSL methods. The Query class calls instance_eval on the block passed to it, which gives us a nice syntax for the CloudWatch domain, by allowing Query's methods to be called inside the block. Then our CloudWatchClient class handles passing our configured queries off to the CloudWatch api finally the data is merged via the MergeData module.  
+
+We can generalize what we've done with our CloudWatch DSL to a blueprint for writing other DSL's in Ruby: 
+
+1. Pick a problem domain that would benefit from a DSL
+2. Invent an ideal syntax using your domain's lexicon 
+3. Create an entry point to your DSL (class or method) 
+4. Create a DSL class with method names corresponding to your chosen syntax 
+5. DSL class should accept a block that is instance_eval'ed for syntax sugar
+6. World Domination! 

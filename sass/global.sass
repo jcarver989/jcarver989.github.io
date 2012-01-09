@@ -80,7 +80,7 @@ a
     font-weight: normal
     margin: 5px 0 20px
 
-  p
+  p, ul, ol
     font-size: 15px
     line-height: 24px
     font-family: Arial, sans-serif
@@ -167,6 +167,7 @@ a
   position: fixed
   width: 25%
   height: 100%
+  text-decoration: none
 
   .arrow-container
     position: fixed
@@ -200,12 +201,14 @@ a
 
 
   &:hover
+
     h3
       display: block
 
     .hover-box
       display: block
       background: $light-green
+
 
 #lefthover
   left: 0
@@ -270,4 +273,9 @@ a
   -o-transform: $trans
   -ms-transform: $trans
 
+
+ul, ol
+
+  li
+    margin-bottom: 10px
 

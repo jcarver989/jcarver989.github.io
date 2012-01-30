@@ -22,12 +22,12 @@ Frontend-Launchpad generates a build script for you that compiles your .coffee a
 
 h3. Optional Modules
 
-The launcpad script will optionally install the following modules into your new project:
+The launchpad script will optionally install the following modules into your new project:
 
 1. "jQuery":http://jquery.com the dom library we all know and love
 2. "Raphy Charts":http://softwarebyjosh.com/raphy-charts beautiful HTML5/SVG/VML charts, if I do say so myself 
 3. "StateMachine.js":https://github.com/jcarver989/state_machine.js easy custom events finite state machines
-4. "JasmineTests":https://github.com/jcarver989/phantom-jasmine superfast command line Jasmine tests with PhantomJS
+4. "JasmineTests":https://github.com/jcarver989/phantom-jasmine superfast command line "Jasmine":http://pivotal.github.com/jasmine/ tests with "PhantomJS":http://phantomjs.org
 5. "PrettyPieces":http://softwarebyjosh.com/pretty-pieces.sass/ like Twitter Bootstrap, but for Sass 
 
 
@@ -47,7 +47,7 @@ cd frontend-launchpad
 
 cd foo_project && ./build.sh
 
-# You're shiny new project is ready to go 
+# Your shiny new project is ready to go 
 
 {% endhighlight %}
 

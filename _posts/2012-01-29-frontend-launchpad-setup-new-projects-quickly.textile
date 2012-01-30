@@ -1,0 +1,65 @@
+---
+layout: post
+title: Stop Wasting Time Setting Up Frontend Projects 
+---
+
+h1. {{ page.title }}
+
+Setting up a new project and its dependencies in most languages is a pain, but particularly so on the frontend where you have lots of separate tools like CoffeeScript, Sass, HTML5 and various 3rd Party JS libs like jQuery all (supposedly) working together. A lot of programmers I've met dismiss the time wasted while setting up a new project as a "one time fee". But in reality most programmers set up new projects all the time - work projects, projects for fun, side projects etc.  We shouldn't be repeatedly wasting time setting up a new project when we could be writing something relevant instead. This kind of problem is ripe for automation.
+
+That's why tonight I hacked together a little Ruby script "Frontend-Launchpad":https://github.com/jcarver989/frontend-launchpad to setup new frontend projects with all the bells and whistles I normally use. While most of the tools it sets up are my own - I'm a eat my own dog food kind of guy (figuratively, not litterally) - you could easily modify the script to suit your own needs.
+
+
+h2. Features
+
+Out of the box, you get the following:
+
+
+h3. CoffeeScript + Sass 
+
+Frontend-Launchpad generates a build script for you that compiles your .coffee and .sass files. CoffeeScript files are compiled and minified using "Dependence":https://github.com/jcarver989/dependence.js with no setup required beyond installing the gem. 
+
+
+h3. Optional Modules
+
+The launcpad script will optionally install the following modules into your new project:
+
+1. "jQuery":http://jquery.com the dom library we all know and love
+2. "Raphy Charts":http://softwarebyjosh.com/raphy-charts beautiful HTML5/SVG/VML charts, if I do say so myself 
+3. "StateMachine.js":https://github.com/jcarver989/state_machine.js easy custom events finite state machines
+4. "JasmineTests":https://github.com/jcarver989/phantom-jasmine superfast command line Jasmine tests with PhantomJS
+5. "PrettyPieces":http://softwarebyjosh.com/pretty-pieces.sass/ like Twitter Bootstrap, but for Sass 
+
+
+h2. Setup
+
+Installation should be really easy, just grab the script from the link below and run the code below. Note* you'll probably want to put this script on your path for easy reuse and tab completion.  
+
+
+{% highlight bash %}
+
+git clone https://jcarver989@github.com/jcarver989/frontend-launchpad.git
+
+cd frontend-launchpad 
+./launch.rb foo_project 
+
+# follow the prompts to install modules...
+
+cd foo_project && ./build.sh
+
+# You're shiny new project is ready to go 
+
+{% endhighlight %}
+
+
+"(medium green bordered pill button) Get Frontend-Launchpad":https://github.com/jcarver989/frontend-launchpad 
+
+h2. Extension
+
+This script only me a short time to hack together so if this script doesn't suit your needs (ex you want to use Bootstrap), feel free to extend it - send me pull requests and/or fork it for your own usage. Whatever you do, don't waste time manually setting up another frontend project manually again! Until next time, cheers.
+
+
+
+
+
+

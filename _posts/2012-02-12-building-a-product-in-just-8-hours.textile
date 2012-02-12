@@ -1,0 +1,74 @@
+---
+layout: post
+title: Building a Product in Just 8 Hours 
+---
+
+h1. {{ page.title }}
+
+Recently at my employer, "Bizo":http://bizo.com, we decided to try a new kind of hack day. Previously during hackdays our engineers worked individually on their own project(s). But on our last hack day we decided to try something new - **The 8 Hour Product Challenge**. 
+
+We would build and launch a completely new product in the course of a normal workday (9-5pm). "Launching" meant this product had to be running publicly on the internet by 5pm - no excuses, no "Wait! I need 5 more minutes" - whatever was there had to be deployed. In short the experience was fantastic and I can't wait to do it again. Here's a breakdown of the experience: 
+
+
+h2. Initial Meeting <small style="color: #555; font-weight: normal;">9:30am</small>
+
+Organizing developers for a meeting of any kind is like trying to heard cats. But if it's a meeting before 11:00am you're not herding regular cats, you're herding sleepy, fat cats with one leg and half an ear. Somehow after a lot of cattle prodding by our "VP of engineering":https://github.com/floodfx our team eventually managed to shuffle its way into the conference room like the decaffeinated zombies we were and get to work. 
+
+We decided to build a news recommender system. The system would use "Bizo's rich business data":http://www.bizo.com/bizographics/index to suggest personalized content for visitors based on things like their industry, company size and seniority, ex: people in a marketing industry would see news relevant to marketers, while people in software would see tech related news items. The goal for the end of the day was to have a small webapp that would show the top 10 news articles for visitors' "business segments":http://www.bizo.com/marketer/targetable_segments
+
+After a bit more discussion, we decided to split tasks up into five groups of two engineers:
+
+* **News Discovery Team**   - discover the top news urls grouped by using data gathered from our network
+* **URL Scraping Team**     - given a url representing a news item scrape the page contents and store them for later use 
+* **Data Extraction Team**  - extract the news item's title &amp; description using the previously scraped pages  
+* **Backend Team**   - backend architecture for the webapp that fetches serves the news content generated in the previous steps 
+* **Frontend Team**  - frontend design + javascript that makes the app functional 
+
+Engineers were assigned more or less randomly, with the exception of myself - I was assigned to the frontend team directly.
+
+
+During the course of our initial planning meeting, we (myself included) often found ourselves becoming sidetracked with feature bloat, premature scalability concerns and a myriad of other things not essential to our MVP. Fortunately one of my coworkers ("Stephen":http://draconianoverlord.com) was smart enough to enforce timeboxing the meeting to one hour - eventually we got things back on topic and designed the critical components before time ran out.  
+
+h2. Start Work <small style="color: #555; font-weight: normal;">10:30am</small>
+
+Once the teams were assigned, we all jumped in and started to work on our relevant tasks. My partner, "Darren":https://github.com/balshor and I immediately started out by sketching ideas on paper for our design. I can't stress enough how important sketching is for being able to rapidly prototype a product - a trick I picked up back when I interned over at "ZURB":http://zurb.com. Only after we had some solid sketches did we move into Photoshop mockups. Meanwhile the other teams were all furiously programming their parts of the application:
+
+* **News Discovery Team** Worked out a simple ranking algorithm and started writing the "Hive":https://cwiki.apache.org/confluence/display/Hive/Home%3bjsessionid=E3548DACBC8C6E9EC8EBE15F65B8CF57 script to extract news items 
+
+* **URL Scraping Team** Started out in Scala hacking up a script to scrape & download url content.
+
+* **Data Extraction Team** Decided to try out the "Pismo":http://rubygems.org/gems/pismo gem to extract summaries and titles from the scraped html content.
+
+* **Backend Team** Was working on getting a sweet "Scalatra":http://www.scalatra.org/ webapp up and running
+
+h2. Lunch Time &amp; Status Updates <small style="color: #555; font-weight: normal;">12:30pm</small>
+
+By lunchtime everything seemed to be coming along nicely. On the frontend had completed our Photoshop mockup and had just began writing some basic css styles. All the other teams reported making good progress on their tasks, with no major snags in the foreseeable future (betcha you never heard that one before...).  
+
+h2. Afternoon <small style="color: #555; font-weight: normal;">1:30pm</small>
+
+My frontend partner and I powered through our post lunch food coma and were able to move into begin wiring up the ui using CoffeeScript in conjunction with "Dependence.js":http://github.com/jcarver989/dependence.js. My teammate and I decided to give pair programming a shot. He has always been more of an Emacs kind of guy, while I prefer vi, but in the interests of learning I decided to try Emacs for the rest of the day - I now know why he's always so worried about contracting carpel tunnel syndrome :).   
+
+Using some sample data generated by the first three teams we were able to get a rough ui working pretty quickly. Our side of things turned out to be pretty straightforward and involved three AJAX requests. One was to retrieve a list of news items grouped by segment from the Scalatra web server, one to get a list of the current targetable segments from the "Bizo API":http://developer.bizo.com/ and another call to the API to retrieve a visitor's business segments (bizographics). 
+
+The only snag we hit was running into a race condition - originally we attempted executing all three requests simultaneously. In reality we had to wait to get the list of segments before getting the visitor's profile. Darren and I just looked at each other and shrugged, then we indented the third API request a few spaces in our CoffeeScript code - race condition solved! Yes that's correct we fixed a race condition by indenting some code, don't judge - it was a hackday. 
+
+The other teams all seemed to be doing well, the scraping team discovered the Scala Collection's magical par(), which turns normal data structures into parallel ones, they almost peed their pants with joy. At this point the backend team had completed the Scalatra app and was working on setting up our eventual deployment to EC2 using our custom infrastructure, cowboy. 
+
+h2. The Home Stretch & Deployment <small style="color: #555; font-weight: normal;">4:30pm</small>
+
+Right around 4:30 we ran into a major problem. There had been a miscommunication regarding the necessary format of the JSON news file needed by the frontend, and our data was coming through to the app in a format that just wouldn't work. We had to scramble and hash things out with the other teams quickly before we hit our 5pm deadline. Thanks to a major push by the Data Extraction Team we were finally able to get everything in place. The product worked! - it wasn't the most polished app ever, but what we had accomplished in just one day was pretty amazing. The product was deployed on EC2 and presented internally within Bizo - it was met with a lot of excitement and Bizo will probably be releasing it publicly in the weeks to come.  
+
+h2. Closing Thoughts
+
+Overall the experiment turned out to be a smash hit. Looking back on the experience there are a bunch of things we could have done better. In retrospect we got sidetracked a bit too much on non essential feature ideas when we really should have been spending time clarifying the format of the news data as it passed through each team's project - this was something that came back and bit us near the end of the day. But mishaps aside it's really amazing what you can accomplish with 9 other talented people in a single day. 
+
+I can't recommend trying this with your team enough - what do you think, is your engineering team up for The 8 Hour Product Challenge? If you're interested in the technologies we used throughout the day, see below.
+
+h2. Appendix, Technologies Used
+
+* **News Discovery Team**   - Hive, Amazon EC2, Amazon S3 
+* **URL Scraping Team**     - Scala 
+* **Data Extraction Team**  - jRuby, gems of note: pismo, right_aws (for Amazon S3) 
+* **Backend Team**   - Scalatra, Amazon S3 
+* **Frontend Team**  - Photoshop, HTML5, Sass, CoffeeScript, jQuery, dependence.js 

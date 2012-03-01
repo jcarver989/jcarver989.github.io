@@ -1,0 +1,142 @@
+---
+layout: post
+title: "Design Pattern: Threaded Requests with Retries"
+---
+
+h1. {{ page.title }}
+
+
+Imagine you have an amazing idea for the next great photo sharing app with Facebook integration. Never mind that there are already 10,000 more photo apps than the world needs right now - to hell with the haters. You will make millions, people will love you and the world will be your oyster (err..figuratively speaking). 
+
+But before you can ascend to the peak of photo sharing world domination - you need to build the app. Naturally you'll need to communicate with Facebook, so you'll probably wind up using their "Graph API":http://developers.facebook.com/docs/reference/api along with some wrapper library for your favorite programming language. Let's assume you write the app in Ruby on Rails and you have some really simple Ruby class that wraps the api, like so:
+
+{% highlight ruby %}
+class FacebookApi
+  def initialize(auth_credentials)
+   # authentication stuff
+  end
+
+  def upload_photo(image_data)
+    # logic to upload a photo to a user's stream
+  end
+
+{% endhighlight %}
+
+
+
+Great, your app can upload photos to Facebook now. But you can't just go running around willy-nilly calling the upload_photo() method - everybody knows that networks are unreliable and can't be trusted to work all the time. Some of those photo uploads are bound to fail and you need to handle that somehow.
+
+
+h2. If at First You Don't Succeed, Try, Try Again 
+
+Lucky for you Facebook is a pretty reliable service - any failures in your api requests are likely going to be fleeting - simply retrying a failed upload a few times will probably work 99% of the time. Of course you want to wait a bit before retrying, eg. maybe an api method stops responding for a minute or two, or you temporarily lose your network connection. 
+
+Ideally we'd do this work in a background thread so we don't block the ui and we'd have some kind of exponentially increasing delay between retries (because by the 3rd retry the chances of a 4th retry succeeding are minuscule). 
+
+
+h2. Generalizing 
+
+Gee this situation seems familiar doesn't it? This kind of scenario (at least for me) crops up all the time in web apps - ex. make a call to some webservice, if it didn't work try again a few times and if that doesn't work log something useful and give up. It'd be great to have some reusable design pattern for this type of situation. Fortunately this turns out to be pretty trivial to do in Ruby (or most languages actually).
+
+I'll show you a simple example of what this might look like in Rails and break down what's happening below the code:
+
+{% highlight ruby %}
+# lib/threaded_api_call.rb
+
+class ThreadedApiCall
+  def initialize(options, &block)
+    execute_in_thread(DEFAULT_OPTS.merge(options), &block)
+  end
+
+  def join
+    @thread.join
+  end
+
+  def result
+    @result
+  end
+
+  private
+
+  def execute_in_thread(opts, &block)
+    @thread = Thread.new do 
+      attempts = 0
+      wait_time = 1
+
+      while (attempts < opts[:max_attempts])
+        begin
+          attempts += 1
+          @result = block.call
+        rescue Exception => e
+          opts[:logger].error "request failed for: #{opts[:name]}"
+          opts[:logger].info "will retry in #{wait_time} seconds" if attempts < opts[:max_attempts]
+          sleep wait_time
+
+          # exponential backoff between retries
+          wait_time *= opts[:wait_interval]
+        ensure
+          opts[:logger].flush
+        end
+      end
+    end
+  end
+
+  DEFAULT_OPTS = {
+    :name          => "generic api request",
+    :max_attempts  => 2,
+    :logger        => Rails.logger,
+    :wait_interval => 2 # seconds
+  }
+{% endhighlight %}
+
+
+Basically we just create a class that takes in a hash of options and a block (similar to a function pointer or lambda in other languages - if you're unfamiliar with Ruby the differences are immaterial for this example). When the class is initialized the block is executed inside of a new thread (to avoid blocking our main thread), if anything goes wrong we simply try again with an exponentially increasing cooldown interval (options[:wait_interval] is the base) up to a maximum number of retries (options[:max_attempts]). Finally if we exceed the maximum retries, we give up and log everything to options[:logger] which defaults to the Rails.logger (make sure to remember to always call flush!).
+
+If for some reason you need to stop the main thread and wait for results to come back, you still can by calling join (just like a normal Ruby thread) and then call result().
+
+
+
+
+h2. Testing
+
+Since we keep our concurrency and api integration code separate this ends up being trivial to test. For our ThreadedApiCall class all we have to do is use a mock/spy or a simple counter. For example:
+
+{% highlight ruby %}
+  describe ThreadedApiCall do
+    it "executes the block passed to it one time on success" do
+      test_method = mock() 
+      test_method.expects(:call).with(:true).exactly_once
+
+      ThreadedApiCall.new :name => :test_api do
+        test_method.call(true)
+      end.join
+    end
+
+    it "retries the block passed to it if failed the first time" do
+      num_calls = 0 
+
+      api_call = ThreadedApiCall.new do
+        # pretend we fail on first try
+        if num_calls == 0
+          num_calls += 1 
+          raise "FAIL!"
+        else
+          num_calls += 1
+          num_calls
+        end
+      end
+
+      api_call.join
+      api_call.result.should == 2
+    end
+
+    # etc for other test cases 
+  end
+{% endhighlight %}
+
+
+
+h2. Using and Abusing
+
+The great thing about this approach is when you add Google+ and Flickr integration into your *amazing* web app you can easily reuse this class to wrap your API calls - so you get threaded retries, logging and exponential backoff all for free!
+

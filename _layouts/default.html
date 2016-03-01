@@ -1,77 +1,25 @@
 <!DOCTYPE HTML>
 <html>
   <head>
-    <link rel="stylesheet" type="text/css" href="/css/global.css" />
-    <link rel="stylesheet" type="text/css" href="/css/railscasts_theme.css" />
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,800,300,600' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="/css/foundation.min.css" />
+    <link rel="stylesheet" type="text/css" href="/css/styles.css" />
+    <link rel="stylesheet" type="text/css" href="/css/main.css" />
+    <link rel="stylesheet" type="text/css" href="http://suavecharts.com/dist/suave-charts.css" />
     <title>{{ page.title }}</title>
+    <meta charset="utf-8"> 
   </head>
   <body>
 
-    {% if page.next.url %}
-    <a href="{{page.next.url}}" id="righthover">
-      <div class="arrow-container">
-        <h3>
-          <small>{{ page.next.date | date_to_string }}</small> 
-          {{page.next.title}}
-        </h3>
-        <div class="hover-box">
-          <img src="/images/right-45.png" />
-        </div>
-      </div>
-    </a>
-    {% endif %}
+<div class="row">
+  <div class="small-12 large-10 columns small-centered">
 
-    {% if page.previous.url %}
-    <a href="{{page.previous.url}}" id="lefthover">
-      <div class="arrow-container">
-        <h3>
-          <small>{{ page.previous.date | date_to_string }}</small> 
-          {{page.previous.title}}
-        </h3>
-
-        <div class="hover-box">
-          <img src="/images/left-45.png" />
-        </div>
-      </div>
-    </a>
-    {% endif %}
-
-    <div class="nav">
-    </div>
-
-    <div class="header">
-      <h2>Software by Josh</h2>
-      <h3>Blog of Josh Carver, programmer + designer</h3>
-      <div class="social-bar">
-        <div class="social-bar-buttons">
-          <a href="/">
-            <img src="/images/home-24.png" />
-          </a>
-
-          <a href="http://github.com/jcarver989">
-            <img src="/images/octocat-24.png" />
-          </a>
-
-          <a href="http://twitter.com/josh_carver">
-            <img src="/images/twitter-24.png" />
-          </a>
-
-          <a href="/talks">
-            <img src="/images/talks-24.png" />
-          </a>
-
-          <a href="http://feeds.feedburner.com/softwarebyjosh">
-            <img src="/images/rss-24.png" />
-          </a>
-        </div>
-        <hr />
-      </div>
-    </div>
 
     <div class="wrapper">
       {{ content }}
     </div>
-
+  </div>
+</div>
 
     <script type="text/javascript">
       var _gaq = _gaq || [];

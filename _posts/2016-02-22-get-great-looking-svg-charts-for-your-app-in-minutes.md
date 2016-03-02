@@ -22,8 +22,6 @@ You can download Suave Charts and find many more examples, including code on the
 
 <a href="http://suavecharts.com/" class="bordered pill green button">Get Suave Charts</a>
 
-<script src="http://suavecharts.com/js/vendor/d3.min.js"></script>
-<script src="http://suavecharts.com/dist/suave-charts.min.js"></script>
 <script type="text/javascript">
 var labels = []
 var data = []

@@ -106,3 +106,45 @@ ul.homepage
   &:hover
     background: $primary
     color: #fff
+
+.animate
+  animation-duration: 0.5s
+  animation-fill-mode: forwards
+
+.delay-short
+  animation-delay: 0.25s
+
+.delay-medium
+  animation-delay: 1s
+
+.delay-long
+  animation-delay: 3s
+
+.fade-in-up
+  opacity: 0
+  animation-name: fadeInUp
+
+@keyframes fadeInUp
+  from
+    opacity: 0
+    transform: translate(0, 50px)
+ 
+  to
+    opacity: 1
+    transform: translate(0, 0)
+
+.fade-in-down
+  opacity: 0
+  animation-name: fadeInDown
+
+@keyframes fadeInDown
+  from
+    opacity: 0
+    transform: translate(0, -50px)
+ 
+  to
+    opacity: 1
+    transform: translate(0, 0)
+
+
+

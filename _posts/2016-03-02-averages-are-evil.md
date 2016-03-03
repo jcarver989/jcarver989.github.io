@@ -11,8 +11,6 @@ But averages are evil, conniving little bastards that **lie to us all the time**
 
 The problem with averages isn't their calculation, after all even elementary school children can correctly compute averages. The problem is we apply averages blindly without stopping to think about what the average is actually doing and by extension what assumptions about the data we're making. 
 
-
-#### Averages Assume A Tight Even Distribution
 Averages sum up the total value across N items, then split that total value into N equal parts. Since we assign each item an equal value of the total sum, we're implicitly assuming that our data is reasonably packed together - i.e. when talking about average customer revenue, we assume most customers tend to have similar amounts of revenue. 
 
 In other words **we assume that data is normally distrbuted** - aka the shape of the values looks something like this: 
@@ -23,7 +21,7 @@ In other words **we assume that data is normally distrbuted** - aka the shape of
 
 For data that follows this type of distribution, averages will work...OK. Since the average winds up in the center mass of the data things aren't terrible but even then its easy to see that the average winds up being pretty far from quite a bit of our data. 
 
-#### When Averages Fail
+### When Averages Fail
 
 But what happens when data doesn't follow a normal distribution, aka the distribution is *skewed*?
 
@@ -32,7 +30,7 @@ But what happens when data doesn't follow a normal distribution, aka the distrib
 
 Now the average tells us nothing useful about our data. So much of the data isn't anywhere close to the average that taking the average is pretty pointless.
 
-#### Averages Lie To You When:
+### Averages Lie To You When:
 
 - Your data is too spread out (i.e. has a high varience)
 - When your data is skewed (not normally distributed)
@@ -48,7 +46,7 @@ Instead of averages use **distributions** aka histograms. Any summarization of d
 
 If you must use a single summary statistic, use a **percentile**. Saying "90% of the data is above/below this value" is much better than just an average. 
 
-#### But Histograms Take Longer To Build Than Averages!
+### But Histograms Take Longer To Build Than Averages!
 
 No they don't - at least not anymore. Here's two really easy ways to get a nice historgam of your dataset in few minutes or less:
 

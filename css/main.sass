@@ -3,7 +3,7 @@
 
 $font: #333
 $font-light: lighten($font, 40%)
-$primary: #2bcbba
+$primary: #78e08f
 
 body, h1, h2, h3, h4, h5, h6
   font-family: 'Open Sans', sans-serif
@@ -56,6 +56,7 @@ h3
   font-weight: 800
   font-size: 1.5rem
   margin: 1.5rem 0 1rem 0
+  text-transform: uppercase
 
 h4
   margin: 1.5rem 0 1rem 0
@@ -91,13 +92,16 @@ a
 ul.homepage
   list-style: none
 
-  
+  &:first-child
+    border-top: 1px solid #eee
 
   a
+    text-decoration: none
     li
       color: $font
       transition: all 0.25s
       padding: 1rem
+      margin: 0
       border-bottom: 1px solid #eee
 
       span
@@ -106,8 +110,6 @@ ul.homepage
         color: lighten($font, 50%)
         transition: all 0.25s
 
-      &:first-child
-        border-top: 1px solid #eee
 
       &:hover
         background: $primary

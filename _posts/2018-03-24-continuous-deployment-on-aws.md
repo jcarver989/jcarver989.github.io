@@ -1,6 +1,6 @@
 ---
 layout: post
-title: How To Setup A Continuous Deployment Pipeline On AWS
+title: How To Do Continuous Deployment  On AWS
 ---
 
 ### Intro

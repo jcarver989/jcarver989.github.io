@@ -3,7 +3,7 @@
 
 $font: #333
 $font-light: lighten($font, 40%)
-$primary: #358d77
+$primary: #2bcbba
 
 body, h1, h2, h3, h4, h5, h6
   font-family: 'Open Sans', sans-serif
@@ -16,8 +16,22 @@ body
   -webkit-font-smoothing: antialiased
   text-rendering: optimizeLegibility
 
+ul li, ol li
+  margin: 1rem 0 1rem 2rem
+
+pre
+  margin: 2rem 0
+  background: #eee
+  padding: 20px
+  &.highlight
+    background: #eee
+
+  code
+    background: transparent
+
 code
-  background: transparent
+  background: #eee
+  padding: 3px 6px
   border: none
 
 h1
@@ -43,8 +57,12 @@ h3
   font-size: 1.5rem
   margin: 1.5rem 0 1rem 0
 
+h4
+  margin: 1.5rem 0 1rem 0
+
 a
   color: $primary
+  text-decoration: underline
   &:hover
     color: lighten($primary, 10%)
 

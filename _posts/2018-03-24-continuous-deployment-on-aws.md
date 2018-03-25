@@ -9,7 +9,7 @@ I've always thought that deploying new code to production should be as simple as
 
 The problem, at least historically was setting up a continuous delivery system was a huge pain in the ass. But with the advent of [AWS Code Pipeline](https://aws.amazon.com/codepipeline/) and [AWS Code Build](https://aws.amazon.com/codebuild/) that's no longer the case. You can setup an end-to-end continuous deployment system that automatically builds & deploys from a Github repository in just a few minutes...well provided you know the right [Cloud Formation](https://aws.amazon.com/cloudformation/) incantation to make it all work.
 
-I've already spent the time to figure this shit out so you don't have to. So let's dive in.
+Fortunately, I've spent a good amount of time fiddling with Cloud Formation, so you don't have to...well at least not as much :).
 
 ### Overview
 

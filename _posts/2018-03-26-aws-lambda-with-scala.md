@@ -3,7 +3,7 @@ layout: post
 title: aws-lambda4s, the easiest way to build Lambdas with scala
 ---
 
-Lately, I've been writing a lot of serverless functions on [AWS Lamba](https://aws.amazon.com/lambda/) using [Scala](https://www.scala-lang.org/) (my favorite "workhorse" language these days). Not having to worry about managing server instances has been a huge boon to my productivity, however like most AWS services, Lambda takes a fair amount of boilerplate to setup in a way that's "production ready".
+Lately, I've been writing a lot of serverless functions using [AWS Lamba](https://aws.amazon.com/lambda/) and [Scala](https://www.scala-lang.org/) (my favorite "workhorse" language these days). Not having to worry about managing server instances has been a huge boon to my productivity, however like most AWS services, Lambda takes a fair amount of boilerplate to setup in a way that's "production ready".
 
 Namely, these are the things I wanted:
 
@@ -60,4 +60,7 @@ class MyAPI extends LambdaProxyFunction {
 }
 ```
 
-That's it! Go [check it out on Github](https://github.com/jcarver989/aws-lambda4s) - pull requests welcome.
+### Conclusion
+
+That's it. You can [find aws-lambda4s on Github](https://github.com/jcarver989/aws-lambda4s) and I have a full working
+example using `aws-lambda4s` that's deployable with a single command [here](https://github.com/jcarver989/aws-lambda4s-example).

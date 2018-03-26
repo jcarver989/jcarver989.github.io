@@ -1,6 +1,6 @@
 ---
 layout: post
-title: aws-lambda4s, the easiest way to build Lambdas with scala
+title: aws-lambda4s, The Easiest Way to Build Lambdas With Scala
 ---
 
 Lately, I've been writing a lot of serverless functions using [AWS Lamba](https://aws.amazon.com/lambda/) and [Scala](https://www.scala-lang.org/) (my favorite "workhorse" language these days). Not having to worry about managing server instances has been a huge boon to my productivity, however like most AWS services, Lambda takes a fair amount of boilerplate to setup in a way that's "production ready".

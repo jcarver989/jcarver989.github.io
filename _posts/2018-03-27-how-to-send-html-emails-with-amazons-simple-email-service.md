@@ -1,6 +1,6 @@
 ---
 layout: post
-title: How To Send HTML Emails With Attachments Using Amazon's Simple Email Service
+title: How To Send Emails With Attachments Using Amazon's Simple Email Service
 ---
 
 [Amazon's Simple Email Service](https://aws.amazon.com/ses/) (SES) is a great tool that lets you
